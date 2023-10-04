@@ -99,6 +99,7 @@ public class Fonction {
             d.setTemps(rs.getTimestamp("temps"));
             liste.add(d);
         }
+        connection.close();
         return liste;
     }
 }
