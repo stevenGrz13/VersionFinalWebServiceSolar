@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 
 public class Connexion {
     public static Connection getConn() throws Exception{
-        String url="jdbc:postgresql://localhost:5432/solar";
+        String url="postgresql://postgres:rS3sqnWeQumUpItnFsfc@containers-us-west-204.railway.app:6544/railway";
         String user="postgres";
-        String pass="steven";
+        String pass="rS3sqnWeQumUpItnFsfc";
         Class.forName("org.postgresql.Driver");
         Connection conn = DriverManager.getConnection(url,user,pass);
         return conn;
