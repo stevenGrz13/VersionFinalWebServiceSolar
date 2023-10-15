@@ -1,21 +1,32 @@
 package com.example.demo5.solar;
 
-import com.example.demo5.solar.entities.Client;
-import com.example.demo5.solar.entities.Donnee;
-import com.example.demo5.solar.entities.UsefulEntity;
+import com.example.demo5.solar.entities.*;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Fonction {
 
     public static Connexion conn = new Connexion();
+    public static TypeBatterie getCapaciteById(int idtypebatterie) throws Exception{
+        String sql = "select * from typebatterie where id="+idtypebatterie;
+        Connection connection = conn.getConn();
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        TypeBatterie res = new TypeBatterie();
+        while(rs.next()){
+            res.setId(rs.getInt("id"));
+            res.setValeur(rs.getDouble("valeur"));
+        }
+        connection.close();
+        return res;
+    }
+
     public static ArrayList<Client> getListClient() throws Exception{
         String sql = "select * from client";
         Connection connection = conn.getConn();
@@ -27,6 +38,7 @@ public class Fonction {
             cl.setId(rs.getInt("id"));
             cl.setEmail(rs.getString("email"));
             cl.setPass(rs.getString("pass"));
+            cl.setLienImage(rs.getString("lienimage"));
             clients.add(cl);
         }
         connection.close();
@@ -43,6 +55,7 @@ public class Fonction {
             cl.setId(rs.getInt("id"));
             cl.setEmail(rs.getString("email"));
             cl.setPass(rs.getString("pass"));
+            cl.setLienImage(rs.getString("lienimage"));
         }
         connection.close();
         return cl;
@@ -53,7 +66,7 @@ public class Fonction {
         usefulEntitySolar.setState(false);
         ArrayList<Client> liste = getListClient();
         for(int i=0; i<liste.size(); i++){
-            if(Objects.equals(email, liste.get(i).getEmail()) && Objects.equals(pass, liste.get(i).getPass())){
+            if((Objects.equals(email, liste.get(i).getEmail()) && Objects.equals(pass, liste.get(i).getPass()))&&(liste.get(i).isHaveQr()==true)){
                 usefulEntitySolar.setIdClient(liste.get(i).getId());
                 usefulEntitySolar.setState(true);
             }
@@ -61,23 +74,28 @@ public class Fonction {
         return usefulEntitySolar;
     }
 
-    public static void signUpClient(String email, String pass) throws Exception{
-        String sql = "insert into client(email,pass) values ('"+email+"','"+pass+"')";
+    public static void signUpClient(String email, String pass, String lienimage, String adresse, String codepostale) throws Exception{
+        String sql = "insert into client(email,pass,lienimage,adresse,codepostal) values ('"+email+"','"+pass+"','"+lienimage+"','"+adresse+"','"+codepostale+"')";
         Connection connection = conn.getConn();
         Statement stmt = connection.createStatement();
         stmt.executeUpdate(sql);
         connection.close();
     }
 
-    public static void insertDonnee(String voltage, String courant, String energie, String puissance) throws Exception {
+    public static void insertDonnee(String idmodule, String voltagepanneau, String voltageoutput, String voltagebatterie, String consommation, String production) throws Exception {
         long milliseconds = System.currentTimeMillis();
         Timestamp temps = new Timestamp(milliseconds);
-        double[] val = new double[4];
-        val[0] = Double.parseDouble(voltage);
-        val[1] = Double.parseDouble(courant);
-        val[2] = Double.parseDouble(energie);
-        val[3] = Double.parseDouble(puissance);
-        String sql = "insert into donnees(voltage,courant,energie,puissance,temps) values ("+val[0]+","+val[1]+","+val[2]+","+val[3]+",'"+temps+"')";
+        Module module = getModuleById(Integer.parseInt(idmodule));
+        double capacitebatterie = getCapaciteById(module.getIdBatterie()).getValeur();
+        double pourcentage = 0;
+        double[] val = new double[5];
+        val[0] = Double.parseDouble(voltagepanneau);
+        val[1] = Double.parseDouble(voltageoutput);
+        val[2] = Double.parseDouble(voltagebatterie);
+        val[3] = Double.parseDouble(production);
+        val[4] = Double.parseDouble(consommation);
+        pourcentage = (capacitebatterie*Double.parseDouble(voltagebatterie))/100;
+        String sql = "insert into donnees(voltagepanneau,voltageoutput,voltagebatterie,production,consommation,valeurbatterie,temps) values ("+val[0]+","+val[1]+","+val[2]+","+val[3]+","+val[4]+","+pourcentage+",'"+temps+"')";
         Connection connection = conn.getConn();
         Statement stmt = connection.createStatement();
         stmt.executeUpdate(sql);
@@ -92,14 +110,92 @@ public class Fonction {
         ArrayList<Donnee> liste = new ArrayList<>();
         while(rs.next()){
             Donnee d = new Donnee();
-            d.setVoltage(rs.getDouble("voltage"));
-            d.setCourant(rs.getDouble("courant"));
-            d.setEnergie(rs.getDouble("energie"));
-            d.setPuissance(rs.getDouble("puissance"));
+            d.setIdmodule(rs.getInt("idmodule"));
+            d.setVoltagePanneau(rs.getDouble("voltagepanneau"));
+            d.setVoltageOutPut(rs.getDouble("voltageoutput"));
+            d.setVoltageBatterie(rs.getDouble("voltagebatterie"));
+            d.setProduction(rs.getDouble("production"));
+            d.setConsommation(rs.getDouble("consommation"));
             d.setTemps(rs.getTimestamp("temps"));
+            d.setValeurBatterie(rs.getDouble("valeurbatterie"));
             liste.add(d);
         }
         connection.close();
         return liste;
+    }
+
+    public static ArrayList<Donnee> getListDonneeSpecifique(String t1, String t2) throws Exception {
+        String sql = "select * from donnees where temps >= '"+t1+"' and temps <= '"+t2+"'";
+        Connection connection = conn.getConn();
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        ArrayList<Donnee> liste = new ArrayList<>();
+        while(rs.next()){
+            Donnee d = new Donnee();
+            d.setIdmodule(rs.getInt("idmodule"));
+            d.setVoltagePanneau(rs.getDouble("voltagepanneau"));
+            d.setVoltageOutPut(rs.getDouble("voltageoutput"));
+            d.setVoltageBatterie(rs.getDouble("voltagebatterie"));
+            d.setProduction(rs.getDouble("production"));
+            d.setConsommation(rs.getDouble("consommation"));
+            d.setTemps(rs.getTimestamp("temps"));
+            d.setValeurBatterie(rs.getDouble("valeurbatterie"));
+            liste.add(d);
+        }
+        connection.close();
+        return liste;
+    }
+
+    public static Module getModuleById(int id) throws Exception{
+        String sql = "select * from module where id="+id;
+        Connection connection = conn.getConn();
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        Module res = new Module();
+        while(rs.next()){
+            res.setId(rs.getInt("id"));
+            res.setId(rs.getInt("qrcode"));
+            res.setId(rs.getInt("idbatterie"));
+        }
+        connection.close();
+        return res;
+    }
+
+    public static void AttributionQrClient(String idclient) throws Exception{
+        String sql = "update client set haveqr=true where id="+Integer.parseInt(idclient);
+        Connection connection = conn.getConn();
+        Statement stmt = connection.createStatement();
+        stmt.executeUpdate(sql);
+        connection.close();
+    }
+
+    public static ArrayList<Module> getListModule() throws Exception{
+        String sql = "select * from module";
+        Connection connection = conn.getConn();
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        ArrayList<Module> liste = new ArrayList<>();
+        while(rs.next()){
+            Module res = new Module();
+            res.setId(rs.getInt("id"));
+            res.setId(rs.getInt("qrcode"));
+            res.setId(rs.getInt("idbatterie"));
+            liste.add(res);
+        }
+        connection.close();
+        return liste;
+    }
+
+    public static Timestamp castToTimestamp(String dateString) {
+        String dateFormatPattern = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(dateFormatPattern);
+
+        try {
+            Date parsedDate = dateFormat.parse(dateString);
+            return new Timestamp(parsedDate.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
