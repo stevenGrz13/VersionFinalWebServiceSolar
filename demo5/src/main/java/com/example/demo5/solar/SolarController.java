@@ -5,14 +5,12 @@ import com.example.demo5.solar.entities.Donnee;
 import com.example.demo5.solar.entities.UsefulEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/solar")
 @CrossOrigin("*")
 public class SolarController {
-
     @GetMapping("clientbyid/{id}")
     public Client ClientByIdSolar(@PathVariable("id") int id) throws Exception{
         return Fonction.getClientById(id);
@@ -41,11 +39,6 @@ public class SolarController {
     @GetMapping("listedonnees")
     public ArrayList<Donnee> listedonnee() throws Exception {
         return Fonction.getListDonnee();
-    }
-
-    @GetMapping("listedonneesspec/{t1}/{t2}")
-    public ArrayList<Donnee> listedonneesspec(@PathVariable("t1") String t1, @PathVariable("t2") String t2) throws Exception {
-        return Fonction.getListDonneeSpecifique(t1,t2);
     }
 
     @GetMapping("attributionqrclient/{idclient}")

@@ -2,14 +2,17 @@ package com.example.demo5.solar;
 
 import com.example.demo5.solar.entities.*;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class Fonction {
-
     public static Connexion conn = new Connexion();
     public static TypeBatterie getCapaciteById(int idtypebatterie) throws Exception{
         String sql = "select * from typebatterie where id="+idtypebatterie;
@@ -138,28 +141,6 @@ public class Fonction {
         return liste;
     }
 
-    public static ArrayList<Donnee> getListDonneeSpecifique(String t1, String t2) throws Exception {
-        String sql = "select * from donnees where temps >= '"+t1+"' and temps <= '"+t2+"'";
-        Connection connection = conn.getConn();
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
-        ArrayList<Donnee> liste = new ArrayList<>();
-        while(rs.next()){
-            Donnee d = new Donnee();
-            d.setIdmodule(rs.getInt("idmodule"));
-            d.setVoltagePanneau(rs.getDouble("voltagepanneau"));
-            d.setVoltageOutPut(rs.getDouble("voltageoutput"));
-            d.setVoltageBatterie(rs.getDouble("voltagebatterie"));
-            d.setProduction(rs.getDouble("production"));
-            d.setConsommation(rs.getDouble("consommation"));
-            d.setTemps(rs.getTimestamp("temps"));
-            d.setValeurBatterie(rs.getDouble("valeurbatterie"));
-            liste.add(d);
-        }
-        connection.close();
-        return liste;
-    }
-
     public static Module getModuleById(int id) throws Exception{
         String sql = "select * from module where id="+id;
         Connection connection = conn.getConn();
@@ -212,16 +193,4 @@ public class Fonction {
             return null;
         }
     }
-
-//    public static void main(String[] args) throws Exception {
-////        signUpClient("james@gmail.com","j","itonylien","jamesadresse","tana102");
-////                ArrayList<TypeBatterie> liste = getListeCapaciteBatterie();
-//        Client liste =getClientById(1);
-////        for(int i=0; i<liste.size(); i++){
-////            System.out.println(liste.get(i).getId());
-////            System.out.println(liste.get(i).getValeur());
-////        }
-//        System.out.println(liste.getId());
-//        System.out.println(liste.getEmail());
-//    }
 }
