@@ -5,7 +5,6 @@ import com.example.demo5.solar.entities.Donnee;
 import com.example.demo5.solar.entities.UsefulEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @RestController
@@ -28,18 +27,23 @@ public class SolarController {
         return Fonction.loginClient(email,pass);
     }
 
-    @GetMapping("insertclient/{email}/{pass}")
-    public void insertClientSolar(@PathVariable("email") String email, @PathVariable("pass")String pass) throws Exception{
-        Fonction.signUpClient(email,pass);
+    @GetMapping("insertclient/{email}/{pass}/{lienimage}")
+    public void insertClientSolar(@PathVariable("email") String email, @PathVariable("pass")String pass, @PathVariable("lienimage")String lienimage, @PathVariable("adresse")String adresse, @PathVariable("codepostal")String codepostal) throws Exception{
+        Fonction.signUpClient(email,pass,lienimage,adresse,codepostal);
     }
 
-    @GetMapping("insertdonnee/{voltage}/{courant}/{energie}/{puissance}")
-    public void insertDonnee(@PathVariable("voltage") String voltage, @PathVariable("courant")String courant, @PathVariable("energie")String energie, @PathVariable("puissance")String puissance) throws Exception{
-        Fonction.insertDonnee(voltage,courant,energie,puissance);
+    @GetMapping("insertdonnee/{idmodule}/{voltagepanneau}/{voltageoutput}/{voltagebatterie}/{consommation}/{production}")
+    public void insertDonnee(@PathVariable("idmodule") String idmodule, @PathVariable("voltagepanneau")String voltagepanneau, @PathVariable("voltageoutput")String voltageoutput, @PathVariable("voltagebatterie")String voltagebatterie, @PathVariable("consommation") String consommation, @PathVariable("production") String production) throws Exception{
+        Fonction.insertDonnee(idmodule,voltagepanneau,voltageoutput,voltagebatterie,consommation,production);
     }
 
     @GetMapping("listedonnees")
     public ArrayList<Donnee> listedonnee() throws Exception {
         return Fonction.getListDonnee();
+    }
+
+    @GetMapping("attributionqrclient/{idclient}")
+    public void AttributionQrClient(@PathVariable("idclient") String idclient) throws Exception {
+        Fonction.AttributionQrClient(idclient);
     }
 }
