@@ -141,28 +141,6 @@ public class Fonction {
         return liste;
     }
 
-//    public static ArrayList<Donnee> getListDonneeSpecifique(String t1, String t2) throws Exception {
-//        String sql = "select * from donnees where temps >= '"+t1+"' and temps <= '"+t2+"'";
-//        Connection connection = conn.getConn();
-//        Statement stmt = connection.createStatement();
-//        ResultSet rs = stmt.executeQuery(sql);
-//        ArrayList<Donnee> liste = new ArrayList<>();
-//        while(rs.next()){
-//            Donnee d = new Donnee();
-//            d.setIdmodule(rs.getInt("idmodule"));
-//            d.setVoltagePanneau(rs.getDouble("voltagepanneau"));
-//            d.setVoltageOutPut(rs.getDouble("voltageoutput"));
-//            d.setVoltageBatterie(rs.getDouble("voltagebatterie"));
-//            d.setProduction(rs.getDouble("production"));
-//            d.setConsommation(rs.getDouble("consommation"));
-//            d.setTemps(rs.getTimestamp("temps"));
-//            d.setValeurBatterie(rs.getDouble("valeurbatterie"));
-//            liste.add(d);
-//        }
-//        connection.close();
-//        return liste;
-//    }
-
     public static Module getModuleById(int id) throws Exception{
         String sql = "select * from module where id="+id;
         Connection connection = conn.getConn();

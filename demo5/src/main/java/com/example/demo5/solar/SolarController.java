@@ -41,13 +41,8 @@ public class SolarController {
         return Fonction.getListDonnee();
     }
 
-//    @GetMapping("listedonneesspec/{t1}/{t2}")
-//    public ArrayList<Donnee> listedonneesspec(@PathVariable("t1") String t1, @PathVariable("t2") String t2) throws Exception {
-//        return Fonction.getListDonneeSpecifique(t1,t2);
-//    }
-
-//    @GetMapping("attributionqrclient/{idclient}")
-//    public void AttributionQrClient(@PathVariable("idclient") String idclient) throws Exception {
-//        Fonction.AttributionQrClient(idclient);
-//    }
+    @GetMapping("attributionqrclient/{idclient}")
+    public void AttributionQrClient(@PathVariable("idclient") String idclient) throws Exception {
+        Fonction.AttributionQrClient(idclient);
+    }
 }
