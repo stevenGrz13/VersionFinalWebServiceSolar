@@ -2,13 +2,11 @@ package com.example.demo5.solar;
 
 import com.example.demo5.solar.entities.*;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 public class Fonction {
 
@@ -25,6 +23,22 @@ public class Fonction {
         }
         connection.close();
         return res;
+    }
+
+    public static ArrayList<TypeBatterie> getListeCapaciteBatterie() throws Exception{
+        String sql = "select * from typebatterie";
+        Connection connection = conn.getConn();
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+        ArrayList<TypeBatterie> liste = new ArrayList<>();
+        while(rs.next()){
+            TypeBatterie res = new TypeBatterie();
+            res.setId(rs.getInt("id"));
+            res.setValeur(rs.getDouble("valeur"));
+            liste.add(res);
+        }
+        connection.close();
+        return liste;
     }
 
     public static ArrayList<Client> getListClient() throws Exception{
@@ -95,7 +109,7 @@ public class Fonction {
         val[3] = Double.parseDouble(production);
         val[4] = Double.parseDouble(consommation);
         pourcentage = (capacitebatterie*Double.parseDouble(voltagebatterie))/100;
-        String sql = "insert into donnees(voltagepanneau,voltageoutput,voltagebatterie,production,consommation,valeurbatterie,temps) values ("+val[0]+","+val[1]+","+val[2]+","+val[3]+","+val[4]+","+pourcentage+",'"+temps+"')";
+        String sql = "insert into donnees(idmodule,voltagepanneau,voltageoutput,voltagebatterie,production,consommation,valeurbatterie,temps) values ("+Integer.parseInt(idmodule)+","+val[0]+","+val[1]+","+val[2]+","+val[3]+","+val[4]+","+pourcentage+",'"+temps+"')";
         Connection connection = conn.getConn();
         Statement stmt = connection.createStatement();
         stmt.executeUpdate(sql);
@@ -154,8 +168,8 @@ public class Fonction {
         Module res = new Module();
         while(rs.next()){
             res.setId(rs.getInt("id"));
-            res.setId(rs.getInt("qrcode"));
-            res.setId(rs.getInt("idbatterie"));
+            res.setQrcode(rs.getString("qrcode"));
+            res.setIdBatterie(rs.getInt("idbatterie"));
         }
         connection.close();
         return res;
@@ -178,8 +192,8 @@ public class Fonction {
         while(rs.next()){
             Module res = new Module();
             res.setId(rs.getInt("id"));
-            res.setId(rs.getInt("qrcode"));
-            res.setId(rs.getInt("idbatterie"));
+            res.setQrcode(rs.getString("qrcode"));
+            res.setIdBatterie(rs.getInt("idbatterie"));
             liste.add(res);
         }
         connection.close();
@@ -197,5 +211,17 @@ public class Fonction {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+//        signUpClient("james@gmail.com","j","itonylien","jamesadresse","tana102");
+//                ArrayList<TypeBatterie> liste = getListeCapaciteBatterie();
+        Client liste =getClientById(1);
+//        for(int i=0; i<liste.size(); i++){
+//            System.out.println(liste.get(i).getId());
+//            System.out.println(liste.get(i).getValeur());
+//        }
+        System.out.println(liste.getId());
+        System.out.println(liste.getEmail());
     }
 }
