@@ -26,6 +26,8 @@ create table module(
     foreign key(idbatterie) references typebatterie(id)
 );
 
+insert into module(qrcode,idbatterie) values ('itonyqr',1);
+
 create table client(
     id serial not null,
     email varchar(500) not null,
@@ -33,7 +35,7 @@ create table client(
     lienimage varchar(500) not null,
     adresse varchar(500) not null,
     codepostal varchar(500) not null,
-    haveQr boolean default false,
+    haveQr boolean default true,
     primary key(id)
 );
 
